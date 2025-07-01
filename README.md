@@ -50,8 +50,8 @@
 
 在您的终端（命令行）中运行：
 ```bash
-git clone <您的项目Git仓库地址>
-cd <项目文件夹名称>
+git clone [<项目Git仓库地址>](https://github.com/twj0/RestrictedContentDL.git)
+cd <项目文件夹名称>如(d:\py_work\RestrictedContentDL)
 ```
 
 ### 第3步：获取4个关键凭证
@@ -60,13 +60,14 @@ cd <项目文件夹名称>
 
 1.  **API_ID 和 API_HASH**:
     *   使用您的Telegram账号登录官方网站 [my.telegram.org](https://my.telegram.org)。
+    *   输入电话号码验证如：+8613211451400，然后接码。
     *   进入 "API development tools" 部分。
     *   创建一个新应用，随便填写应用名称，您将会得到 `api_id` 和 `api_hash`。
 
 2.  **BOT_TOKEN**:
     *   在Telegram中，与官方的 `@BotFather` 对话。
     *   发送 `/newbot` 命令，按照提示创建您的机器人。
-    *   BotFather会给您一长串由数字和字母组成的Token，这就是 `BOT_TOKEN`。（**注意：在此项目中，Bot Token并非必需，但保留配置以备未来扩展**）。
+    *   BotFather会给您一长串由数字和字母组成的Token，这就是 `BOT_TOKEN`。
 
 3.  **SESSION_STRING**:
     *   这是驱动整个应用的核心！它代表您个人账户的登录会话。
@@ -85,8 +86,6 @@ cd <项目文件夹名称>
     API_ID=1234567
     API_HASH=abcdef1234567890abcdef1234567890
     SESSION_STRING=BAAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    
-    # Bot Token在此项目中可选，但建议保留
     BOT_TOKEN=789123:ABCDEFGHIJKLMNOPQRSTUVWXYZ-abcde
     ```
 
