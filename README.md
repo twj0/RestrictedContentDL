@@ -15,11 +15,11 @@
 
 ---
 
-下面是我对这个项目的一些二次开发的readme
+下面是我对这个项目的一些二次开发的说明
+喜欢的话就给原作者点赞吧
 
 ---
 
-# ✨  Telegram Media
 
 这是一个基于Python、FastAPI和Pyrogram构建的功能强大的Web应用程序
 
@@ -192,6 +192,10 @@ python backend.py
 感谢使用！希望这个工具能为您带来便利。
 
 ---
+下面是原作者的README.md
+---
+
+# Restricted Content Downloader
 ## Features
 
 - 📥 Download media (photos, videos, audio, documents).

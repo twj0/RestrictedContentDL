@@ -12,3 +12,4 @@ helpers/__pycache__/msg.cpython-311.pyc
 helpers/__pycache__/utils.cpython-311.pyc
 config.env
 media_bot.session
+config.env
