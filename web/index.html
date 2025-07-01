@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tg_video 下载推荐原作者方式</title>
+    <style>
+        :root {
+            /* 亮色主题变量 */
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            --container-bg: rgba(255, 255, 255, 0.95);
+            --container-border: rgba(255,255,255,0.3);
+            --text-primary: #333;
+            --text-secondary: #7f8c8d;
+            --text-meta: #7f8c8d;
+            --video-item-bg: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+            --input-bg: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            --caption-bg: rgba(0,0,0,0.03);
+            --caption-border: #667eea;
+            --thumbnail-bg: #e9ecef;
+            --status-bg: rgba(255,255,255,0.1);
+            --status-border: rgba(255,255,255,0.2);
+        }
+
+        [data-theme="dark"] {
+            /* 暗色主题变量 */
+            --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 25%, #2c3e50 50%, #34495e 75%, #2980b9 100%);
+            --container-bg: rgba(45, 55, 72, 0.95);
+            --container-border: rgba(255,255,255,0.1);
+            --text-primary: #e2e8f0;
+            --text-secondary: #a0aec0;
+            --text-meta: #718096;
+            --video-item-bg: linear-gradient(135deg, rgba(45, 55, 72, 0.95), rgba(54, 69, 92, 0.85));
+            --input-bg: linear-gradient(135deg, #4a5568, #2d3748);
+            --caption-bg: rgba(255,255,255,0.05);
+            --caption-border: #4facfe;
+            --thumbnail-bg: #4a5568;
+            --status-bg: rgba(0,0,0,0.2);
+            --status-border: rgba(255,255,255,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* 主题切换按钮 */
+        .theme-toggle {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 60px;
+            height: 30px;
+            background: linear-gradient(135deg, #f39c12, #f1c40f);
+            border-radius: 25px;
+            cursor: pointer;
+            border: 3px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transition: all 0.4s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 5px;
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+        }
+
+        .theme-toggle::before {
+            content: '🌞';
+            position: absolute;
+            left: 5px;
+            font-size: 18px;
+            transition: all 0.4s ease;
+        }
+
+        [data-theme="dark"] .theme-toggle::before {
+            content: '🌙';
+            left: 30px;
+        }
+
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            left: 4px;
+            transition: all 0.4s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        [data-theme="dark"] .theme-toggle::after {
+            left: 30px;
+            background: #2c3e50;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+        }
+
+        h1 { 
+            text-align: center; 
+            color: #fff;
+            font-size: 3rem;
+            font-weight: 700;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientText 8s ease infinite;
+        }
+
+        @keyframes gradientText {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .controls { 
+            display: flex; 
+            gap: 15px; 
+            margin-bottom: 30px; 
+            padding: 25px; 
+            background: var(--container-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1), 0 0 0 1px var(--container-border);
+            border: 1px solid var(--container-border);
+            flex-wrap: wrap;
+        }
+
+        .controls input, .controls button { 
+            padding: 15px 20px; 
+            border: none;
+            border-radius: 15px; 
+            font-size: 16px; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .controls input { 
+            flex: 1;
+            min-width: 200px;
+            background: var(--input-bg);
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            color: var(--text-primary);
+        }
+
+        .controls input:focus {
+            outline: none;
+            border: 2px solid #4facfe;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .controls button { 
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; 
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .controls button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .controls button:hover::before {
+            left: 100%;
+        }
+
+        .controls button:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        #status { 
+            text-align: center; 
+            margin: 20px; 
+            font-weight: bold; 
+            font-size: 18px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            padding: 15px;
+            background: var(--status-bg);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            border: 1px solid var(--status-border);
+        }
+
+        #video-list { 
+            list-style: none; 
+            padding: 0; 
+        }
+
+        .video-item { 
+            display: flex; 
+            align-items: center; 
+            background: var(--video-item-bg);
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px; 
+            padding: 25px; 
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid var(--container-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7, #ff6b6b);
+            background-size: 400% 100%;
+            animation: colorFlow 3s linear infinite;
+        }
+
+        @keyframes colorFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .video-item:hover { 
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15), 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        /* 封面图样式 */
+        .thumbnail-container {
+            flex-shrink: 0;
+            width: 160px;
+            height: 90px;
+            margin-right: 25px;
+            border-radius: 10px;
+            background-color: var(--thumbnail-bg);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 24px;
+        }
+
+        .thumbnail-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-info { 
+            flex-grow: 1; 
+        }
+
+        .video-info p { 
+            margin: 8px 0; 
+            line-height: 1.5;
+        }
+
+        .video-info .file-name { 
+            font-weight: bold; 
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .video-info .meta-info {
+            color: var(--text-meta);
+            font-size: 14px;
+        }
+
+        /* 消息标题样式 */
+        .caption-text {
+            font-style: italic;
+            color: var(--text-secondary);
+            background-color: var(--caption-bg);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 3px solid var(--caption-border);
+            line-height: 1.5;
+        }
+
+        .video-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .video-actions button { 
+            padding: 12px 20px; 
+            cursor: pointer;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 下载按钮样式 */
+        .download-btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+        }
+
+        /* 收藏按钮样式 */
+        .favorite-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+
+        .favorite-btn:hover {
+            background: linear-gradient(135deg, #ee5a52, #ff6b6b);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        /* 链接按钮样式 */
+        .link-btn {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .link-btn:hover {
+            background: linear-gradient(135deg, #44a08d, #4ecdc4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        .video-actions a {
+            text-decoration: none;
+        }
+
+        /* 文件大小和时长的彩色标签 */
+        .size-tag, .duration-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 0 5px;
+            color: white;
+        }
+
+        .size-tag {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .duration-tag {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        /* 日期标签 */
+        .date-tag {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .theme-toggle {
+                top: 15px;
+                right: 15px;
+                width: 50px;
+                height: 25px;
+            }
+
+            .theme-toggle::after {
+                width: 18px;
+                height: 18px;
+            }
+
+            [data-theme="dark"] .theme-toggle::after {
+                left: 26px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+            
+            .controls input, .controls button {
+                width: 100%;
+            }
+            
+            .video-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .thumbnail-container {
+                margin: 0 0 15px 0;
+                align-self: center;
+            }
+            
+            .video-actions {
+                margin-top: 15px;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 成功提示动画 */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 主题切换按钮 -->
+    <div class="theme-toggle" onclick="toggleTheme()" title="切换主题"></div>
+
+    <div class="container">
+        <h1>✨ tg_video 下载推荐原作者方式 ✨</h1>
+
+        <div class="controls">
+            <input type="text" id="channelId" placeholder="🔍 输入频道用户名或ID, e.g., jurunvshen">
+            <input type="date" id="dateFrom" title="开始日期">
+            <input type="date" id="dateTo" title="结束日期">
+            <button onclick="fetchVideos()">🚀 获取视频</button>
+        </div>
+
+        <div id="status"></div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div style="color: white; font-weight: bold;">正在获取数据，请稍候...</div>
+        </div>
+
+        <ul id="video-list">
+            <!-- 视频列表将在这里动态生成 -->
+        </ul>
+    </div>
+
+    <script>
+        // 主题切换功能
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // 页面加载时恢复主题设置
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.body.setAttribute('data-theme', savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.setAttribute('data-theme', 'dark');
+            }
+        }
+
+        // 监听系统主题变化
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme')) {
+                    document.body.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+                }
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            // 默认设置今天的日期为结束日期
+            document.getElementById('dateTo').valueAsDate = new Date();
+        });
+
+        async function fetchVideos() {
+            const channelId = document.getElementById('channelId').value.trim();
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            const videoList = document.getElementById('video-list');
+            const status = document.getElementById('status');
+            const loading = document.getElementById('loading');
+
+            if (!channelId) {
+                alert('请输入频道用户名或ID！');
+                return;
+            }
+
+            status.textContent = '';
+            loading.style.display = 'block';
+            videoList.innerHTML = '';
+
+            let apiUrl = `/api/channel/${channelId}/videos?`;
+            if (dateFrom) apiUrl += `date_from=${dateFrom}&`;
+            if (dateTo) apiUrl += `date_to=${dateTo}&`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`错误 ${response.status}: ${errorData.detail}`);
+                }
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+                
+                if (data.videos.length === 0) {
+                    status.innerHTML = '📭 在指定日期范围内没有找到视频。';
+                    return;
+                }
+
+                status.innerHTML = `🎉 成功找到 <strong>${data.videos.length}</strong> 个视频！`;
+
+                data.videos.forEach((video, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'video-item';
+                    li.style.animationDelay = `${index * 0.1}s`;
+                    
+                    const fileSizeMB = (video.file_size_bytes / (1024 * 1024)).toFixed(2);
+                    const duration = Math.round(video.duration_seconds);
+                    const date = new Date(video.date);
+
+                    li.innerHTML = `
+                        <div class="thumbnail-container">
+                            ${video.has_thumbnail ? 
+                                `<img src="/api/thumbnail/${video.chat_id}/${video.message_id}" alt="视频封面">` : 
+                                '🎬'
+                            }
+                        </div>
+                        <div class="video-info">
+                            <p class="file-name">📹 ${video.file_name}</p>
+                            ${video.caption ? `<div class="caption-text">${video.caption.replace(/\n/g, '<br>')}</div>` : ''}
+                            <div class="date-tag">📅 ${date.toLocaleString()}</div>
+                            <p class="meta-info" style="margin-top: 10px;">
+                                <span class="size-tag">💾 ${fileSizeMB} MB</span>
+                                <span class="duration-tag">⏱️ ${duration}秒</span>
+                            </p>
+                        </div>
+                        <div class="video-actions">
+                            <!-- 修改下载按钮onclick调用 requestDownload -->
+                            <button class="download-btn" onclick="requestDownload(${video.chat_id}, ${video.message_id})">⬇️ 下载</button>
+                            <button class="favorite-btn" onclick="forwardToSaved(${video.chat_id}, ${video.message_id})">⭐ 收藏</button>
+                            <a href="${video.link}" target="_blank"><button class="link-btn">🔗 查看原帖</button></a>
+                        </div>
+                    `;
+                    videoList.appendChild(li);
+                });
+
+            } catch (error) {
+                loading.style.display = 'none';
+                status.innerHTML = `❌ 获取失败: ${error.message}`;
+                alert(`获取失败: ${error.message}`);
+            }
+        }
+
+        // [全新!] 异步下载任务提交函数
+        async function requestDownload(chatId, messageId) {
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = `🚀 已提交下载任务 (ID: ${messageId})，正在后台处理...`;
+            
+            try {
+                const response = await fetch('/api/download/request', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ chat_id: chatId, message_id: messageId }),
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`错误 ${response.status}: ${errorData.detail}`);
+                }
+                
+                const data = await response.json();
+                const taskId = data.task_id;
+                
+                // 任务提交成功后，开始轮询状态
+                pollDownloadStatus(taskId, messageId);
+                
+            } catch (error) {
+                statusEl.innerHTML = `❌ 提交下载任务失败: ${error.message}`;
+                alert(`提交下载任务失败: ${error.message}`);
+            }
+        }
+
+        // [全新!] 轮询函数，每隔几秒查询一次任务状态
+        function pollDownloadStatus(taskId, messageId) {
+            const statusEl = document.getElementById('status');
+            
+            const intervalId = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/download/status/${taskId}`);
+                    if (!response.ok) {
+                        // 如果查询失败，则稍后重试
+                        return;
+                    }
+                    
+                    const task = await response.json();
+                    
+                    if (task.status === 'completed') {
+                        clearInterval(intervalId); // 停止轮询
+                        statusEl.innerHTML = `🎉 视频 ${messageId} 已准备就绪！`;
+                        
+                        // [重要!] 准备就绪后，自动触发浏览器下载
+                        window.location.href = `/api/download/fetch/${taskId}`;
+                        
+                    } else if (task.status === 'failed') {
+                        clearInterval(intervalId); // 停止轮询
+                        statusEl.innerHTML = `❌ 视频 ${messageId} 下载失败: ${task.error || '未知错误'}`;
+                        
+                    } else {
+                        // 状态仍然是 'processing'，继续显示提示
+                        statusEl.innerHTML = `⚙️ 视频 ${messageId} 仍在后台处理中，请稍候...`;
+                    }
+                    
+                } catch (error) {
+                    // 网络错误等，继续轮询
+                    console.log('轮询状态时出错:', error);
+                }
+            }, 3000); // 每3秒查询一次
+        }
+
+        async function forwardToSaved(chatId, messageId) {
+            const status = document.getElementById('status');
+            status.innerHTML = `🚀 正在转发消息 ${messageId} 到收藏夹...`;
+
+            try {
+                const response = await fetch('/api/forward', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        from_chat_id: chatId,
+                        to_chat_id: 'me', // 'me' 代表收藏夹
+                        message_ids: [messageId]
+                    }),
+                });
+
+                if (!response.ok) {
+                     const errorData = await response.json();
+                    throw new Error(`错误 ${response.status}: ${errorData.detail}`);
+                }
+
+                const result = await response.json();
+                status.innerHTML = `✅ 消息 ${messageId} 转发成功!`;
+                
+                // 创建成功提示
+                const successMsg = document.createElement('div');
+                successMsg.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #00b894, #00cec9);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    font-weight: bold;
+                    z-index: 1000;
+                    box-shadow: 0 10px 25px rgba(0,184,148,0.3);
+                    animation: slideIn 0.5s ease;
+                `;
+                successMsg.innerHTML = '🎉 转发成功!';
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => {
+                    successMsg.remove();
+                }, 3000);
+
+            } catch (error) {
+                 status.innerHTML = `❌ 转发失败: ${error.message}`;
+                 alert(`转发失败: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

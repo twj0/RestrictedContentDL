@@ -1,9 +1,14 @@
-*__pycache__*
-*.session*
-*.vscode*
-# *.env
-*.log
-*.json
-*.html
-./*.py
+*.__pycache__/*
 test.py
+config.env
+config.env
+logs.txt
+config.env
+__pycache__/config.cpython-311.pyc
+backend.log
+__pycache__/logger.cpython-311.pyc
+helpers/__pycache__/files.cpython-311.pyc
+helpers/__pycache__/msg.cpython-311.pyc
+helpers/__pycache__/utils.cpython-311.pyc
+config.env
+media_bot.session

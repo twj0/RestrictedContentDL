@@ -4,3 +4,7 @@ Pyleaves
 python-dotenv
 psutil
 pillow
+fastapi
+uvicorn
+"pyrogram[fastapi]"
+pydantic
